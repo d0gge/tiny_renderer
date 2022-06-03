@@ -3,11 +3,22 @@
 const TGAColor white = TGAColor(255, 255, 255, 255);
 const TGAColor red = TGAColor(255, 0, 0, 255);
 
+void line(int x0, int y0, int x1, int y1, TGAImage& image, TGAColor color)
+{
+  for (float t = 0.f; t < 1.f; t += 0.1f)
+  {
+    float x = x0 + (x1 - x0) * t;
+    float y = y0 + (y1 - y0) * t;
+    image.set(x, y, color);
+  }
+}
+
 int main(int argc, char** argv)
 {
   TGAImage image(100, 100, TGAImage::RGB);
   image.set(0, 0, red);
-  image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
+  line(10, 10, 20, 20, image, white);
+  image.flip_vertically();
   image.write_tga_file("output.tga");
   return 0;
 }
