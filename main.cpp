@@ -3,13 +3,41 @@
 const TGAColor white = TGAColor(255, 255, 255, 255);
 const TGAColor red = TGAColor(255, 0, 0, 255);
 
-void line(int x0, int y0, int x1, int y1, TGAImage& image, TGAColor color)
+void DrawLine(int x0, int y0, int x1, int y1, TGAImage& image, TGAColor color)
 {
-  for (float t = 0.f; t < 1.f; t += 0.1f)
+  bool steep = false;
+  if (std::abs(x0 - x1) < std::abs(y0 - y1))
   {
-    float x = x0 + (x1 - x0) * t;
-    float y = y0 + (y1 - y0) * t;
-    image.set(x, y, color);
+    std::swap(x0, y0);
+    std::swap(x1, y1);
+    steep = true;
+  }
+  if (x0 > x1)
+  {
+    std::swap(x0, x1);
+    std::swap(y0, y1);
+  }
+  float dx = x1 - x0;
+  float dy = y1 - y0;
+  float derror = std::abs(dy / (float)dx);
+  float error = 0;
+  int y = y0;
+  for (int x = x0; x < x1; x++)
+  {
+    if (steep)
+    {
+      image.set(y, x, color);
+    }
+    else
+    {
+      image.set(x, y, color);
+    }
+    error += derror;
+    if (error > 0.5f)
+    {
+      y += (y1 > y0 ? 1 : -1);
+      error -= 1.f;
+    }
   }
 }
 
@@ -17,7 +45,9 @@ int main(int argc, char** argv)
 {
   TGAImage image(100, 100, TGAImage::RGB);
   image.set(0, 0, red);
-  line(10, 10, 20, 20, image, white);
+  DrawLine(13, 20, 80, 40, image, white);
+  DrawLine(20, 13, 40, 80, image, red);
+  DrawLine(80, 40, 13, 20, image, red);
   image.flip_vertically();
   image.write_tga_file("output.tga");
   return 0;
